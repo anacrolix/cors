@@ -10,6 +10,7 @@ const (
 	AccessControlAllowCredentials = "Access-Control-Allow-Credentials"
 	AccessControlAllowOrigin      = "Access-Control-Allow-Origin"
 	AccessControlExposeHeaders    = "Access-Control-Expose-Headers"
+	AccessControlAllowHeaders     = "Access-Control-Allow-Headers"
 )
 
 var originKey = textproto.CanonicalMIMEHeaderKey("Origin")
@@ -17,7 +18,7 @@ var originKey = textproto.CanonicalMIMEHeaderKey("Origin")
 type Response struct {
 	AllowOrigin string
 	// AllowMethods     []string
-	// AllowHeaders     []string
+	AllowHeaders  []string
 	ExposeHeaders []string
 	// MaxAge           string
 	AllowCredentials bool
@@ -36,6 +37,9 @@ func Middleware(f func(*http.Request) Response) func(http.Handler) http.Handler 
 			}
 			if len(cr.ExposeHeaders) > 0 {
 				w.Header().Set(AccessControlExposeHeaders, strings.Join(cr.ExposeHeaders, ", "))
+			}
+			if len(cr.AllowHeaders) > 0 {
+				w.Header().Set(AccessControlAllowHeaders, strings.Join(cr.AllowHeaders, ", "))
 			}
 			// }
 			h.ServeHTTP(w, r)
